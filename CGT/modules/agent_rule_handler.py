@@ -4,6 +4,7 @@ Agent for analyzing business rules and determining necessary changes.
 
 import openai
 from core.config import settings
+from modules.token_counter import count_tokens
 
 openai.api_key = settings["openai_api_key"]
 
@@ -56,6 +57,11 @@ Analyze the existing directory structure and determine:
 - Maintain consistency with existing naming conventions and directory structures.
 - Only list files that are truly necessary for the implementation.
 """
+    
+    prompt_tokens = count_tokens(prompt)
+    if prompt_tokens > 8000:
+        raise Exception("Prompt too long. Please provide a shorter prompt.")
+    
     response = openai.ChatCompletion.create(
         model="gpt-4",
         messages=[{"role": "system", "content": "You are a software architecture expert."},

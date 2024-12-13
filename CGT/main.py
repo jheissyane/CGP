@@ -15,13 +15,16 @@ def main():
     path = settings["path_to_project"]
 
     # Reading the directory structure
-    structure = get_files_tree(path)
+    structure, basenames = get_files_tree(path)
 
     print("Directory Structure:")
     print(structure)
 
+    print("\nFormatted Basenames:")
+    print(basenames)
+
     extensions_to_exclude = [
-        ".class", ".tmp", ".log", ".iml", ".bak"
+        ".class", ".tmp", ".log", ".iml", ".bak, .png"
     ]
     exclude_names = [
         "build", "target", ".gradle", "out", "node_modules", ".idea", ".DS_Store", "Thumbs.db"
@@ -29,9 +32,6 @@ def main():
 
     filtered_tree = filter_unnecessary_files(structure, extensions_to_exclude, exclude_names)
 
-    filenames = []
-    for item in filtered_tree:
-        filenames.append(item["filename"])
 
     # Business rule
     rule = "Adicionar um usuário administrador com as seguintes permissões: visualizar todos os usuários, editar todos os usuários, excluir todos os usuários"
@@ -41,7 +41,7 @@ def main():
 
     # Rule analysis
     try:
-        changes = analyze_business_rule(filenames, rule)
+        changes = analyze_business_rule(basenames, rule)
         print("\nFiles to be modified and order:")
         for change in changes:
             print(change)
