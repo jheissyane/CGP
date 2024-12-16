@@ -24,32 +24,26 @@ History of changes:
 {previous_changes}
 
 Now, based on the business rule, the provided source code (if provided), and the history of changes (if provided), 
-generate the necessary code for the file {filepath}. 
-Make sure that the generated code complies with previous modifications without breaking consistency.
-Make sure to follow best practices and maintain the existing code structure.
-Do not provide any additional information or context.
-Do not provide incomplete or incorrect code.
-Avoid any responses like "here's your code" or "here's a basic example". 
-The response should be exclusively the code for the file,
-without additional explanations or comments.
+generate the necessary and **complete code** for the file {filepath}.
+Always provide the code as a **standalone implementation** **without placeholders, missing parts, or comments like "//implement this" or "TODO".**
+Ensure the following:
+- The code is consistent with previous modifications.
+- Follow best practices and maintain the existing structure and style.
+- Do not provide incomplete, incorrect, or placeholder code.
+- Do not include comments explaining the changes or logic; only provide the code.
+- If no changes are required, do not return any code.
+- If the source code is empty, create the implementation entirely from the business rule.
 
-#Rules:
-- *Never* provide additional information or comments.
-- Maintain consistency with previous changes.
-- If the history of changes is empty, disregard this rule.
-- Make sure the code is a complete, standalone implementation for this specific file
-- If the source code is empty, disregard this rule and provide the modification according to the business rule.
-- If the source code is provided, make sure the modification is consistent with it.
-- Never provide additional information about the context or business rule.
-- Only provide the code for the current file.
-- Do not provide incomplete or incorrect code.
-- If the response is not correct, state that it was not possible to generate the modification.
-- If no changes are necessary, do not provide code.
-- It should return the complete file, not just the modification.
-- Always follow best programming practices.
-- Implement all the methods
+Rules:
+1. **Do not include placeholders or incomplete code.**
+2. Always return the full, standalone implementation of the file.
+3. Ensure consistency with any previous changes in the history.
+4. Do not include any explanations or context beyond the code itself.
+5. Return the entire file, not just the modified parts.
+6. If it is not possible to generate a valid modification, return no code at all.
+7. Each file must have a unique implementation. Follow the best practices and conventions of the language.
 
-Example response:
+Example of valid response:
 ```
  public class HelloWorld {{
      public static void main(String[] args) {{
@@ -57,14 +51,21 @@ Example response:
      }}
  }}
  ```
+
+Example of not valid response:
+```
+public class HelloWorld {{
+    // Logic for the main method
+}}
+```
 """
 
     response = openai.ChatCompletion.create(
-        model="gpt-4",
+        model="gpt-4o",
         messages=[{"role": "system", "content": "You are a software development assistant."},
                   {"role": "user", "content": prompt}],
     )
-    
+
     try:
         implementation = response["choices"][0]["message"]["content"]
         

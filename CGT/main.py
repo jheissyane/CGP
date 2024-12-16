@@ -8,6 +8,7 @@ from modules.agent_file_modifier import modify_file
 from modules.read_file_content import read_file_content
 from modules.filter_unnecessary_files import filter_unnecessary_files
 from modules.agent_rule_enricher import enrich_business_rule
+from modules.agent_file_filter import determine_exclusions
 from core.config import settings
 
 def main():
@@ -23,13 +24,13 @@ def main():
     print("\nFormatted Basenames:")
     print(basenames)
 
-    extensions_to_exclude = [
-        ".class", ".tmp", ".log", ".iml", ".bak, .png"
-    ]
-    exclude_names = [
-        "build", "target", ".gradle", "out", "node_modules", ".idea", ".DS_Store", "Thumbs.db"
-    ]
+    # Determining exclusions
+    exclusions = determine_exclusions(basenames)
+    
+    extensions_to_exclude = exclusions["extensions_to_exclude"]
+    exclude_names = exclusions["exclude_names"]
 
+    
     filtered_tree = filter_unnecessary_files(structure, extensions_to_exclude, exclude_names)
 
 

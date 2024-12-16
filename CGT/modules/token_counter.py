@@ -1,12 +1,12 @@
 import tiktoken
 
-def count_tokens(content, model="gpt-4"):
+def count_tokens(content, model="gpt-4o"):
     """
     Count the number of tokens in the given content for the specified model.
 
     Args:
         content (str): The content to count the tokens for.
-        model (str): The model to use for token counting. Defaults to "gpt-4".
+        model (str): The model to use for token counting. Defaults to "gpt-4o".
 
     Returns:
         int: The number of tokens in the content.

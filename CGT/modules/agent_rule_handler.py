@@ -5,6 +5,7 @@ Agent for analyzing business rules and determining necessary changes.
 import openai
 from core.config import settings
 from modules.token_counter import count_tokens
+import json
 
 openai.api_key = settings["openai_api_key"]
 
@@ -24,56 +25,53 @@ And the following business rule:
 
 "{rule}"
 
-Identify which files need to be modified and/or created, and in what order, to implement the business rule. 
-Respond in JSON format with the fields: "file" (file name) and "order" (modification order).
-DO NOT include any additional information or explanations.
-
 ### Task ###
 Analyze the existing directory structure and determine:
 1. Which files need to be modified or created.
 2. The order in which these modifications or creations should occur.
-3. Ensure consistency with the existing structure and best practices.
 
 ### Instructions ###
-- Provide the response strictly in JSON format.
-- Each JSON entry must include the fields:
-  - "file": The pure file name (e.g., "UserService.java"). Do not include paths or prefixes.
-  - "order": The sequence in which the modifications or creations should be executed.
-- Consider creating new files if necessary to implement the rule properly.
-- Do not include any prefixes or folder paths in the "file" field.
-- Ensure that the "file" field contains only the file name.
-- Provide the "order" field to indicate the sequence of modifications or creations.
-- Do not provide additional explanations or any text outside the JSON format.
-- Only provide the file names that *REALLY* need to be modified or created.
+- Respond strictly with a valid JSON array.
+- Do NOT include any explanations, text, or formatting such as triple backticks (` ``` `).
+- Ensure the JSON contains objects with the following fields:
+  - "file": The name of the file (e.g., "UserService.java"), without any path or prefix.
+  - "order": The order in which the files should be modified or created.
+  - "action": Either "create" or "modify" to indicate the action to take on each file.
+- Do not include any other text, metadata, or information outside the JSON array.
 
 ### Example Response ###
 [
-    {{"file": "AdminRole.java", "order": 1, "action": "create"}},
-    {{"file": "UserController.java", "order": 2, "action": "modify"}},
+    {{"file": "Admin.java", "order": 1, "action": "create"}},
+    {{"file": "Usuario.java", "order": 2, "action": "modify"}}
 ]
 
 ### Additional Considerations ###
-- If the business rule requires new entities, ensure they integrate logically with existing files.
-- Maintain consistency with existing naming conventions and directory structures.
-- Only list files that are truly necessary for the implementation.
+- Include only files relevant to implementing the business rule.
+- Follow best practices and ensure consistency with the existing structure.
+- If the business rule requires creating new entities, ensure they integrate logically with the existing files.
 """
-    
+
     prompt_tokens = count_tokens(prompt)
-    if prompt_tokens > 8000:
+    if prompt_tokens > 16000:
         raise Exception("Prompt too long. Please provide a shorter prompt.")
     
     response = openai.ChatCompletion.create(
-        model="gpt-4",
+        model="gpt-4o",
         messages=[{"role": "system", "content": "You are a software architecture expert."},
                   {"role": "user", "content": prompt}],
     )
     
     try:
         # Extract the raw response from OpenAI
-        raw_response = response["choices"][0]["message"]["content"]
-        parsed_response = eval(raw_response)
+        raw_response = response["choices"][0]["message"]["content"].strip()
+
+        # Parse the JSON response
+        parsed_response = json.loads(raw_response)
 
         return parsed_response
+    except json.JSONDecodeError as e:
+        print(f"Error interpreting JSON response: {e}")
+        return []
     except Exception as e:
-        print(f"Error interpreting response: {e}")
+        print(f"Unexpected error: {e}")
         return []

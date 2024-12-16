@@ -62,7 +62,7 @@ As a product manager, I want to introduce an Admin role with specific permission
 """
 
     response = openai.ChatCompletion.create(
-        model="gpt-4",
+        model="gpt-4o",
         messages=[
             {"role": "system", "content": "You are a software development and product management expert."},
             {"role": "user", "content": prompt}
