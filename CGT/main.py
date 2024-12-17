@@ -15,7 +15,7 @@ import os
 
 def main():
     # Repository path
-    path = "D:/jheis/Documents/FindUs/TCC-FindUs"
+    path = settings["path_to_project"]
 
     # Reading the directory structure
     structure, basenames = get_files_tree(path)
