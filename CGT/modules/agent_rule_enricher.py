@@ -67,6 +67,8 @@ As a product manager, I want to introduce an Admin role with specific permission
             {"role": "system", "content": "You are a software development and product management expert."},
             {"role": "user", "content": prompt}
         ],
+        temperature=0,
+        max_tokens=16383,
     )
 
     try:

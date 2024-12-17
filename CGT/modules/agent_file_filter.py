@@ -47,6 +47,8 @@ Analyze the provided filenames and determine:
         model="gpt-4o",
         messages=[{"role": "system", "content": "You are a software architecture expert."},
                   {"role": "user", "content": prompt}],
+        temperature=0,
+        max_tokens=16383,
     )
 
     try:

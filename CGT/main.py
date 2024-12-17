@@ -10,10 +10,12 @@ from modules.filter_unnecessary_files import filter_unnecessary_files
 from modules.agent_rule_enricher import enrich_business_rule
 from modules.agent_file_filter import determine_exclusions
 from core.config import settings
+from modules.split_structure_to_chunks import split_structure_to_chunks
+import os
 
 def main():
     # Repository path
-    path = settings["path_to_project"]
+    path = "D:/jheis/Documents/FindUs/TCC-FindUs"
 
     # Reading the directory structure
     structure, basenames = get_files_tree(path)
@@ -33,6 +35,8 @@ def main():
     
     filtered_tree = filter_unnecessary_files(structure, extensions_to_exclude, exclude_names)
 
+    # Split the structure into chunks
+    chunks = split_structure_to_chunks(filtered_tree, 8000)
 
     # Business rule
     rule = "Adicionar um usuário administrador com as seguintes permissões: visualizar todos os usuários, editar todos os usuários, excluir todos os usuários"
@@ -42,7 +46,7 @@ def main():
 
     # Rule analysis
     try:
-        changes = analyze_business_rule(basenames, rule)
+        changes = analyze_business_rule(chunks, rule)
         print("\nFiles to be modified and order:")
         for change in changes:
             print(change)
@@ -50,10 +54,10 @@ def main():
         print(f"Error analyzing business rule: {e}")
         return
     
-    context = {}
 
     for change in changes:
         target_file = change["file"]
+        file_name = os.path.basename(target_file)
         print(f"\nProcessing file: {target_file}")
         
         file_path = None
@@ -61,12 +65,12 @@ def main():
         file_found = False
 
         for item in filtered_tree:
-            if target_file in item["filename"]:
+            if file_name in item["filename"]:
                 file_found = True
                 try:
                     file_path = item["path"]
                     content = read_file_content(file_path)
-                    implementation = modify_file(target_file, content, rule, context)
+                    implementation = modify_file(file_path, content, rule, changes)
                     print(f"\n{target_file} updated:")
                     print(implementation)
                 except Exception as e:
@@ -76,7 +80,7 @@ def main():
         
         if not file_found:
             try:
-                implementation = modify_file(target_file, "", rule, context)
+                implementation = modify_file(target_file, "implement the entire file", rule, changes)
                 print(f"\n{target_file} created:")
                 print(implementation)
             except Exception as e:

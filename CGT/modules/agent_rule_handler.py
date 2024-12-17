@@ -17,13 +17,9 @@ def analyze_business_rule(directory_structure: str, rule: str) -> list:
     """
     prompt = f"""
 You are a software engineering expert with more than 10 years of experience. 
-You have received the following directory structure of a project:
-
-{directory_structure}
-
-And the following business rule:
-
-"{rule}"
+**You will receive a directory structure of a project**
+And have received the following business rule:
+{rule}
 
 ### Task ###
 Analyze the existing directory structure and determine:
@@ -34,15 +30,15 @@ Analyze the existing directory structure and determine:
 - Respond strictly with a valid JSON array.
 - Do NOT include any explanations, text, or formatting such as triple backticks (` ``` `).
 - Ensure the JSON contains objects with the following fields:
-  - "file": The name of the file (e.g., "UserService.java"), without any path or prefix.
+  - "file": The path to the file that needs to be modified or created.
   - "order": The order in which the files should be modified or created.
   - "action": Either "create" or "modify" to indicate the action to take on each file.
 - Do not include any other text, metadata, or information outside the JSON array.
 
 ### Example Response ###
 [
-    {{"file": "Admin.java", "order": 1, "action": "create"}},
-    {{"file": "Usuario.java", "order": 2, "action": "modify"}}
+    {{"file": "D:/jheis/Documents/FindUs/TCC-FindUs/src/main/java/com/findus/models/Admin.java", "order": 1, "action": "create"}},
+    {{"file": "D:/jheis/Documents/FindUs/TCC-FindUs/src/main/java/com/findus/models/Usuario.java", "order": 2, "action": "modify"}}
 ]
 
 ### Additional Considerations ###
@@ -50,15 +46,26 @@ Analyze the existing directory structure and determine:
 - Follow best practices and ensure consistency with the existing structure.
 - If the business rule requires creating new entities, ensure they integrate logically with the existing files.
 """
+    
 
     prompt_tokens = count_tokens(prompt)
     if prompt_tokens > 16000:
         raise Exception("Prompt too long. Please provide a shorter prompt.")
     
+
+    print(directory_structure)
+    print(rule)
+
+    messages = [{"role": "system", "content": prompt}]
+    for chunk in directory_structure:
+        messages.append({"role": "user", "content": json.dumps(chunk, indent=2)})
+
+
     response = openai.ChatCompletion.create(
         model="gpt-4o",
-        messages=[{"role": "system", "content": "You are a software architecture expert."},
-                  {"role": "user", "content": prompt}],
+        messages=messages,
+        temperature=0,
+        max_tokens=16383,
     )
     
     try:
