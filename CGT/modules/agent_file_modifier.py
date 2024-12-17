@@ -24,7 +24,7 @@ History of changes:
 {previous_changes}
 
 Now, based on the business rule, the provided source code (if provided), and the history of changes (if provided), 
-generate the necessary and **complete code** for the file {filepath}.
+generate the necessary and **complete code** for the **file {filepath}**.
 Always provide the code as a **standalone implementation** **without placeholders, missing parts, or comments like "//implement this" or "TODO".**
 Ensure the following:
 - The code is consistent with previous modifications.
@@ -33,15 +33,18 @@ Ensure the following:
 - Do not include comments explaining the changes or logic; only provide the code.
 - If no changes are required, do not return any code.
 - If the source code is empty, create the implementation entirely from the business rule.
+- Strictly follow all the rules provided.
 
-Rules:
-1. **Do not include placeholders or incomplete code.**
-2. Always return the full, standalone implementation of the file.
-3. Ensure consistency with any previous changes in the history.
-4. Do not include any explanations or context beyond the code itself.
-5. Return the entire file, not just the modified parts.
-6. If it is not possible to generate a valid modification, return no code at all.
-7. Each file must have a unique implementation. Follow the best practices and conventions of the language.
+**Strictly follow these rules:**
+1. The file must contain **exactly one class**. Do not include more than one class, interface, or enum in the file.
+2. The code must be consistent with previous modifications.
+3. Follow best practices and maintain the existing structure and style.
+4. Do not include incomplete, incorrect, or placeholder code.
+5. Do not include comments explaining the changes or logic; only provide the code.
+6. If no changes are required, do not return any code.
+7. If the source code is empty, create the implementation entirely from the business rule.
+8. Each file must have a unique implementation and only the code for **this specific file**: {filepath}.
+9. Do not include any unrelated logic or classes that do not belong to this file.
 
 Example of valid response:
 ```
@@ -52,10 +55,14 @@ Example of valid response:
  }}
  ```
 
-Example of not valid response:
+Example of NOT valid response:
 ```
 public class HelloWorld {{
     // Logic for the main method
+}}
+
+public class AnotherClass {{
+    // 
 }}
 ```
 """
