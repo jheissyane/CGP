@@ -1,7 +1,7 @@
 def split_structure_to_chunks(structure, max_tokens):
     # Helper: Approximate token size for a given item
     def get_token_count(item):
-        return (len(item['filename']) + len(item['path'])) // 4
+        return (len(item['rel_path'])) // 4
 
     # Split the structure into chunks based on max_tokens
     chunks = []

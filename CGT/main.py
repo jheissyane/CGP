@@ -20,12 +20,6 @@ def main():
     # Reading the directory structure
     structure, basenames = get_files_tree(path)
 
-    print("Directory Structure:")
-    print(structure)
-
-    print("\nFormatted Basenames:")
-    print(basenames)
-
     # Determining exclusions
     exclusions = determine_exclusions(basenames)
     
@@ -55,6 +49,9 @@ def main():
         return
     
 
+    setFilePaths = { y["file"].lower() for y in changes }
+    filteredTreeList = [x for x in filtered_tree if x["path"].lower() in setFilePaths ]
+
     for change in changes:
         target_file = change["file"]
         file_name = os.path.basename(target_file)
@@ -64,7 +61,7 @@ def main():
         content = None
         file_found = False
 
-        for item in filtered_tree:
+        for item in filteredTreeList:
             if file_name in item["filename"]:
                 file_found = True
                 try:
